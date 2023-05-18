@@ -24,14 +24,21 @@ public class ConnectFour {
         player1.setColor(p1IsRed);
         player2.setColor(!p1IsRed);
 
-        while(true) {
-            takeTurn(player1, p1IsRed);
-            takeTurn(player2, !p1IsRed);
+        boolean loop = true;
+        while(loop) {
+            loop = takeTurn(player1, p1IsRed);
+            if(loop) loop = takeTurn(player2, !p1IsRed);
             System.out.println(wins);
         }
     }
 
-    private void takeTurn(BotInterface player, boolean isRed) {
+    /**
+     * 
+     * @param player
+     * @param isRed
+     * @return          returns true if the game should continue running
+     */
+    private boolean takeTurn(BotInterface player, boolean isRed) {
         if(placePuck(player.move(gameBoard), isRed)) {
             if(isRed) {
                 wins--;
@@ -40,19 +47,20 @@ public class ConnectFour {
                 wins++;
                 System.out.println("red wins");
             }
-            return;
+            return false;
         }
         updateVisuals();
         if(checkForWin(isRed)) {
             if(isRed) {
                 wins++;
-                System.out.println("black wins");
+                System.out.println("red wins");
             } else {
                 wins--;
-                System.out.println("red wins");
+                System.out.println("black wins");
             }
-            return;
+            return false;
         }
+        return true;
     }
 
     /**
@@ -144,6 +152,7 @@ public class ConnectFour {
      * @return          returns true if unsuccessful placing puck, false if successful.
      */
     private boolean placePuck(int column, boolean isRed) {
+        if(column < 0 || column >= gameBoard[0].length) return false;
         for(int r = gameBoard.length-1; r >= 0; r--) {
             if(gameBoard[r][column] == null) {
                 gameBoard[r][column] = new Puck(isRed);
