@@ -8,18 +8,44 @@ public class ConnectFour {
     BotInterface player1, player2;
     int wins; //0 if equal wins, +1 for each player1 win, 
     VisualInterface rend = new Renderer();
+    int delayMilliseconds = 0;
 
+    /**
+     * Creates ConnectFour match with 2 bots/players.
+     * @param player1   bot/player class.
+     * @param player2   bot/player class.
+     */
     public ConnectFour(BotInterface player1, BotInterface player2) {
         this.player1 = player1;
         this.player2 = player2;
         updateVisuals();
     }
 
+    /**
+     * Creates ConnectFour game with 2 bots/players with a delay between turns
+     * @param player1   bot/player class.
+     * @param player2   bot/player class.
+     * @param delayMilliseconds     delay between turns in milliseconds.
+     */
+    public ConnectFour(BotInterface player1, BotInterface player2, int delayMilliseconds) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.delayMilliseconds = delayMilliseconds;
+        updateVisuals();
+    }
+
+    /**
+     * Runs two games, each with a different bot starting.
+     */
     public void runGames() {
         runGame(true);
         runGame(false);
     }
 
+    /**
+     * Runs a ConnectFour game, specifying bot/player colors.
+     * @param p1IsRed   true if player 1 is red, false if black.
+     */
     public void runGame(boolean p1IsRed) {
         player1.setColor(p1IsRed);
         player2.setColor(!p1IsRed);
@@ -27,16 +53,31 @@ public class ConnectFour {
         boolean loop = true;
         while(loop) {
             loop = takeTurn(player1, p1IsRed);
+
+            try {
+                Thread.sleep(delayMilliseconds);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
             if(loop) loop = takeTurn(player2, !p1IsRed);
-            System.out.println(wins);
+            // System.out.println(wins);
+
+            try {
+                Thread.sleep(delayMilliseconds);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
     /**
-     * 
-     * @param player
-     * @param isRed
-     * @return          returns true if the game should continue running
+     * Has the player object take a turn, checking for invalid/winning moves & updating visuals.
+     * @param player    bot/player object which will take a turn.
+     * @param isRed     the color of the bot/player object.
+     * @return          returns true if the game should continue running.
      */
     private boolean takeTurn(BotInterface player, boolean isRed) {
         if(placePuck(player.takeTurn(gameBoard), isRed)) {
@@ -64,8 +105,8 @@ public class ConnectFour {
     }
 
     /**
-     * 
-     * @param checkRed
+     * Checks if a player won the game.
+     * @param checkRed  if true, red is checked for a win. If false, black is checked.
      * @return          returns true if color checked won, false otherwise.
      */
     private boolean checkForWin(boolean checkRed) {
@@ -125,10 +166,10 @@ public class ConnectFour {
     }
 
     /**
-     * 
-     * @param puck
-     * @param checkRed
-     * @return          returns true if puck exists and is the specified color
+     * returns true if a puck object is a particular color.
+     * @param puck      puck object.
+     * @param checkRed  if true, checks for if it is red; if false, checks if it is black.
+     * @return          returns true if puck exists and is the specified color.
      */
     private boolean isColorPuck(Puck puck, boolean checkRed) {
         if(puck != null) {
@@ -146,9 +187,9 @@ public class ConnectFour {
     }
 
     /**
-     * 
-     * @param column
-     * @param isRed
+     * Places a puck object of specified color in a specified column, checking for legality.
+     * @param column    column to place puck in.
+     * @param isRed     places a red puck if true, black if false.
      * @return          returns true if unsuccessful placing puck, false if successful.
      */
     private boolean placePuck(int column, boolean isRed) {
@@ -162,12 +203,15 @@ public class ConnectFour {
         return true;
     }
 
+    /**
+     * Updates the game visuals.
+     */
     public void updateVisuals() {
         rend.updateVisuals(gameBoard);
     }
 
     public static void main(String[] args) {
-        ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot());
+        ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot(), 500);
         match.runGame(true);
 
     }

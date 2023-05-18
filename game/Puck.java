@@ -13,10 +13,18 @@ public class Puck {
         this.isRed = isRed;
     }
 
+    /**
+     * Returns true if object is red.
+     * @return  Returns true if object is red.
+     */
     public boolean isRed() {
         return isRed;
     }
 
+    /**
+     * String representing the puck.
+     * @return  String representing the puck.
+     */
     public String toString() {
         String out = "(";
         if(isRed) {
