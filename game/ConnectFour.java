@@ -39,7 +39,7 @@ public class ConnectFour {
      * @return          returns true if the game should continue running
      */
     private boolean takeTurn(BotInterface player, boolean isRed) {
-        if(placePuck(player.move(gameBoard), isRed)) {
+        if(placePuck(player.takeTurn(gameBoard), isRed)) {
             if(isRed) {
                 wins--;
                 System.out.println("black wins, invalid move");

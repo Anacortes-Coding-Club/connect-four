@@ -13,7 +13,7 @@ public class WalliBot implements BotInterface{
         this.isRed = isRed;
     }
 
-    public int move(Puck[][] gameBoard) {
+    public int takeTurn(Puck[][] gameBoard) {
         return (int) (Math.random() * 7.0);
     }
     
