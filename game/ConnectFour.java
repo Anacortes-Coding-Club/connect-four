@@ -1,14 +1,19 @@
 package game;
 
 import game.VisualHelper.*;
+
+import java.awt.Color;
+import java.time.format.FormatStyle;
+
 import bots.*;
 
 public class ConnectFour {
     Puck[][] gameBoard = new Puck[6][7];
     BotInterface player1, player2;
     int wins; //0 if equal wins, +1 for each player1 win, 
-    VisualInterface rend = new Renderer();
+    VisualInterface rend;
     int delayMilliseconds = 0;
+    boolean runInterface = true;
 
     /**
      * Creates ConnectFour match with 2 bots/players.
@@ -18,7 +23,19 @@ public class ConnectFour {
     public ConnectFour(BotInterface player1, BotInterface player2) {
         this.player1 = player1;
         this.player2 = player2;
+        rend = new Renderer(Color.GRAY);
         updateVisuals();
+    }
+
+    /**
+     * Creates ConnectFour match with 2 bots/players with the option to disable the interface.
+     * @param player1   bot/player class.
+     * @param player2   bot/player class.
+     */
+    public ConnectFour(BotInterface player1, BotInterface player2, boolean runInterface) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.runInterface = runInterface;
     }
 
     /**
@@ -31,6 +48,7 @@ public class ConnectFour {
         this.player1 = player1;
         this.player2 = player2;
         this.delayMilliseconds = delayMilliseconds;
+        rend = new Renderer(Color.GRAY);
         updateVisuals();
     }
 
@@ -207,11 +225,12 @@ public class ConnectFour {
      * Updates the game visuals.
      */
     public void updateVisuals() {
-        rend.updateVisuals(gameBoard);
+        if(runInterface) rend.updateVisuals(gameBoard);
     }
 
     public static void main(String[] args) {
         ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot(), 500);
+        // ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot(), false);
         match.runGame(true);
 
     }
