@@ -1,7 +1,7 @@
 package game;
 
 import game.VisualHelper.*;
-import bots.WalliBot;
+import bots.*;
 
 public class ConnectFour {
     Puck[][] gameBoard = new Puck[6][7];
@@ -42,10 +42,10 @@ public class ConnectFour {
         if(placePuck(player.move(gameBoard), isRed)) {
             if(isRed) {
                 wins--;
-                System.out.println("black wins");
+                System.out.println("black wins, invalid move");
             } else {
                 wins++;
-                System.out.println("red wins");
+                System.out.println("red wins, invalid move");
             }
             return false;
         }
@@ -53,10 +53,10 @@ public class ConnectFour {
         if(checkForWin(isRed)) {
             if(isRed) {
                 wins++;
-                System.out.println("red wins");
+                System.out.println("red wins, 4 in a row!");
             } else {
                 wins--;
-                System.out.println("black wins");
+                System.out.println("black wins, 4 in a row!");
             }
             return false;
         }
@@ -152,7 +152,7 @@ public class ConnectFour {
      * @return          returns true if unsuccessful placing puck, false if successful.
      */
     private boolean placePuck(int column, boolean isRed) {
-        if(column < 0 || column >= gameBoard[0].length) return false;
+        if(column < 0 || column >= gameBoard[0].length) return true;
         for(int r = gameBoard.length-1; r >= 0; r--) {
             if(gameBoard[r][column] == null) {
                 gameBoard[r][column] = new Puck(isRed);
@@ -167,7 +167,7 @@ public class ConnectFour {
     }
 
     public static void main(String[] args) {
-        ConnectFour match = new ConnectFour(new WalliBot(0), new WalliBot(4));
+        ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot());
         match.runGame(true);
 
     }
