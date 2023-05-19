@@ -6,7 +6,8 @@ import game.Puck;
 
 public class LogansMiniMaxBot implements BotInterface
 {
-    private boolean isRed;
+    private boolean isRed = false;
+    private boolean firtMove = true;
 
     public LogansMiniMaxBot()
     {
@@ -19,7 +20,12 @@ public class LogansMiniMaxBot implements BotInterface
 
     public int takeTurn(Puck[][] gameBoard)
     {
-        
+        if(firtMove)
+        {
+            firtMove = false;
+            return (int) (Math.random() * 7.0);
+        }
+
         // int numOfWaysToPlay = 0;
 
         // for(int i = 0; i < gameBoard[0].length; i++)
@@ -30,31 +36,63 @@ public class LogansMiniMaxBot implements BotInterface
         //     }
         // }
 
-        miniMax(gameBoard, 15, true);
-        
+        int bestRow = 0;
+        int currentBestEval = Integer.MIN_VALUE;
 
-        return (int) (Math.random() * 7.0);
+        for(int i = 0; i < 7; i++)
+        {
+            Puck[][] temp = copyPuckBoard(gameBoard);
+
+            if(placePuck(temp, i, isRed));
+            {
+                //System.out.println("Evaluating");
+                int eval = miniMax(temp, 60, true);
+                //System.out.println("Evaluated value:");
+                //System.out.println(eval);
+                //System.out.println("");
+                if(eval >= currentBestEval)
+                {
+                    currentBestEval = eval;
+                    bestRow = i;
+                }
+            }
+
+        }
+        //gameBoard = new Puck[100][100];
+
+        return bestRow;
     }
 
     private int miniMax(Puck[][] boardState, int depth, boolean maximizingPlayer)
     {
-        boolean fullBoard = true;
-        for (Puck[] pucks : boardState) 
+        boolean fullBoard = false;
+        int c = 0;
+        for (Puck[] pucks : boardState)
         {
             for (Puck puck : pucks) 
             {
                 if(puck != null)
                 {
-                    fullBoard = false;
+                    c++;
                 }
             }
         }
-        if(depth == 0 || fullBoard || checkForWin(boardState, maximizingPlayer))
+        if(c >= 7)
+        {
+            fullBoard = true;
+            
+        }
+
+        //System.out.println("IS the board full:" +fullBoard + ". depth: " + depth + ".");
+
+        if(depth == 0 || fullBoard /*|| checkForWin(boardState, maximizingPlayer)*/)
         {
             int val = 0;
 
-            positionalEval(boardState, val);
-            
+            val = positionalEval(boardState, val);
+
+            //System.out.println("The lowest branch value is:" + val);
+
             return val;
         }
 
@@ -101,7 +139,7 @@ public class LogansMiniMaxBot implements BotInterface
      * @param val
      * 
      */
-    private void positionalEval(Puck[][] boardState, int val)
+    private int positionalEval(Puck[][] boardState, int val)
     {
         for(int row = 0; row < boardState.length; row++)
             {
@@ -127,7 +165,7 @@ public class LogansMiniMaxBot implements BotInterface
                                                 if(boardState[row - 2][col] != null)
                                                     if(boardState[row-2][col].isRed() == isLineRed)
                                                     {
-                                                        if(isRed) { if(boardState[row-2][col].isRed()) {val++;} else val--; } else { if(boardState[row-2][col].isRed()) {val--;} else {val++;} } //val add
+                                                        if(isRed) { if(boardState[row-2][col].isRed()) {val++;} else val--; } else { if(boardState[row-2][col].isRed()) {val++;} else {val--;} } //val add
                                                     }
                                         }
                             }
@@ -193,7 +231,7 @@ public class LogansMiniMaxBot implements BotInterface
                                     {
                                         if(isRed) { if(boardState[row-1][col+1].isRed()) {val++;} else val--; } else { if(boardState[row-1][col+1].isRed()) {val--;} else {val++;} } //val add
                                         
-                                        if(col+1 < boardState[row].length && row-1 > 0) //traversal 2
+                                        if(col+2 < boardState[row].length && row-2 > 0) //traversal 2
                                             if(boardState[row-2][col + 2] != null)
                                                 if(boardState[row-2][col + 2].isRed() == isLineRed)
                                                 {
@@ -250,23 +288,23 @@ public class LogansMiniMaxBot implements BotInterface
                             }
 
                         if(col+1 < boardState[row].length && row-1 > 0)
-                            if(boardState[row+1][col-1] == null)
+                            if(boardState[row-1][col+1] == null)
                             {
                                 //entry point with open left and down
                                 boolean isLineRed = boardState[row][col].isRed();
                                 if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
 
                                 if(col-1 > 0 && row+1 < boardState.length - 1) //traversal 1
-                                if(boardState[row-1][col + 1] != null)
-                                    if(boardState[row-1][col + 1].isRed() == isLineRed)
+                                if(boardState[row+1][col - 1] != null)
+                                    if(boardState[row+1][col - 1].isRed() == isLineRed)
                                     {
-                                        if(isRed) { if(boardState[row-1][col+1].isRed()) {val++;} else val--; } else { if(boardState[row-1][col+1].isRed()) {val--;} else {val++;} } //val add
+                                        if(isRed) { if(boardState[row+1][col-1].isRed()) {val++;} else val--; } else { if(boardState[row+1][col-1].isRed()) {val--;} else {val++;} } //val add
                                         
-                                        if(col-1 > 0 && row+1 < boardState.length - 1) //traversal 2
-                                            if(boardState[row-2][col + 2] != null)
-                                                if(boardState[row-2][col + 2].isRed() == isLineRed)
+                                        if(col-2 > 0 && row+2 < boardState.length - 1) //traversal 2
+                                            if(boardState[row+2][col - 2] != null)
+                                                if(boardState[row+2][col - 2].isRed() == isLineRed)
                                                 {
-                                                    if(isRed) { if(boardState[row-2][col+2].isRed()) {val++;} else val--; } else { if(boardState[row-2][col+2].isRed()) {val--;} else {val++;} } //val add
+                                                    if(isRed) { if(boardState[row+2][col-2].isRed()) {val++;} else val--; } else { if(boardState[row+2][col-2].isRed()) {val--;} else {val++;} } //val add
                                                 }
 
                                     }
@@ -276,9 +314,11 @@ public class LogansMiniMaxBot implements BotInterface
             }
 
         if(checkForWin(boardState, isRed))
-            val += 6;
+            val += 2000; //very good ;)
         if(checkForWin(boardState, !isRed))
-            val -= 6;
+            val = Integer.MIN_VALUE; //more than very bad ;)
+
+        return val;
     }
 
     private boolean placePuck(Puck[][] board, int column, boolean isRed)
@@ -364,5 +404,20 @@ public class LogansMiniMaxBot implements BotInterface
             }
         }
         return false;
+    }
+
+    private Puck[][] copyPuckBoard(Puck[][] originalPucks)
+    {
+        Puck[][] newBoard = new Puck[originalPucks.length][originalPucks[0].length];
+        for(int i = 0; i < originalPucks.length; i++)
+        {
+            for(int j = 0; j < originalPucks[i].length; j++)
+            {
+                if(originalPucks[i][j] != null)
+                newBoard[i][j] = new Puck(originalPucks[i][j].isRed());
+            }
+        }
+
+        return newBoard;
     }
 }
