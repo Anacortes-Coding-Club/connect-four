@@ -1,7 +1,6 @@
 package bots;
 
 import game.BotInterface;
-import game.ConnectFour;
 import game.Puck;
 
 public class LogansMiniMaxBot implements BotInterface
@@ -85,7 +84,7 @@ public class LogansMiniMaxBot implements BotInterface
 
         //System.out.println("IS the board full:" +fullBoard + ". depth: " + depth + ".");
 
-        if(depth == 0 || fullBoard /*|| checkForWin(boardState, maximizingPlayer)*/)
+        if(depth == 0 || fullBoard /*|| checkForWin(boardState, !maximizingPlayer) || checkForWin(boardState, maximizingPlayer)*/)
         {
             int val = 0;
 
@@ -142,181 +141,204 @@ public class LogansMiniMaxBot implements BotInterface
     private int positionalEval(Puck[][] boardState, int val)
     {
         for(int row = 0; row < boardState.length; row++)
+        {
+            for(int col = 0; col < boardState[row].length; col++)
             {
-                for(int col = 0; col < boardState[row].length; col++)
+                if(boardState[row][col] != null)
                 {
-                    if(boardState[row][col] != null)
-                    {
-                        //cardinal directions
-                        if(row+1 < boardState.length - 1)//check if direction has an open end
-                            if(boardState[row+1][col] == null)
-                            {
-                                //entry point with open right
-                                boolean isLineRed = boardState[row][col].isRed();
-                                if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
+                    //cardinal directions
+                    if(row+1 < boardState.length - 1)//check if direction has an open end
+                        if(boardState[row+1][col] == null)
+                        {
+                            //entry point with open right
+                            boolean isLineRed = boardState[row][col].isRed();
+                            if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
 
-                                if(row-1 > 0) //traversal 1
-                                    if(boardState[row-1][col] != null)
-                                        if(boardState[row-1][col].isRed() == isLineRed)
-                                        {
-                                            if(isRed) { if(boardState[row-1][col].isRed()) {val++;} else val--; } else { if(boardState[row-1][col].isRed()) {val--;} else {val++;} } //val add
-
-                                            if(row-2 > 0) //traversal 2
-                                                if(boardState[row - 2][col] != null)
-                                                    if(boardState[row-2][col].isRed() == isLineRed)
-                                                    {
-                                                        if(isRed) { if(boardState[row-2][col].isRed()) {val++;} else val--; } else { if(boardState[row-2][col].isRed()) {val++;} else {val--;} } //val add
-                                                    }
-                                        }
-                            }
-                        
-                        if(row-1 > 0)//check if direction has an open end
-                            if(boardState[row-1][col] == null)
-                            {
-                                //entry point with open left
-                                boolean isLineRed = boardState[row][col].isRed();
-                                if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
-
-                                if(row+1 < boardState.length - 1) //traversal 1
-                                    if(boardState[row+1][col] != null)
-                                        if(boardState[row+1][col].isRed() == isLineRed)
-                                        {
-                                            if(isRed) { if(boardState[row+1][col].isRed()) {val++;} else val--; } else { if(boardState[row+1][col].isRed()) {val--;} else {val++;} } //val add
-                                            
-                                            if(row+2 < boardState.length - 1) //traversal 2
-                                                if(boardState[row+2][col] != null)
-                                                    if(boardState[row+2][col].isRed() == isLineRed)
-                                                    {
-                                                        if(isRed) { if(boardState[row+2][col].isRed()) {val++;} else val--; } else { if(boardState[row+2][col].isRed()) {val--;} else {val++;} } //val add
-                                                    }
-
-                                        }
-                            }
-
-
-                        if(col-1 > 0)
-                            if(boardState[row][col - 1] == null)
-                            {
-                                //entry point with open up
-                                boolean isLineRed = boardState[row][col].isRed();
-                                if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
-
-                                if(col+1 < boardState[row].length - 1) //traversal 1
-                                    if(boardState[row][col+1] != null)
-                                        if(boardState[row][col+1].isRed() == isLineRed)
-                                        {
-                                            if(isRed) { if(boardState[row][col+1].isRed()) {val++;} else val--; } else { if(boardState[row][col+1].isRed()) {val--;} else {val++;} } //val add
-                                            
-                                            if(col+2 < boardState[row].length - 1) //traversal 2
-                                                if(boardState[row][col+2] != null)
-                                                    if(boardState[row][col+2].isRed() == isLineRed)
-                                                    {
-                                                        if(isRed) { if(boardState[row][col+2].isRed()) {val++;} else val--; } else { if(boardState[row][col+2].isRed()) {val--;} else {val++;} } //val add
-                                                    }
-
-                                        }
-                            }
-
-                        //diagonal directions
-                        if(col-1 > 0 && row+1 < boardState.length - 1)
-                            if(boardState[row + 1][col - 1] == null)
-                            {
-                                //entry point with open right and up
-                                boolean isLineRed = boardState[row][col].isRed();
-                                if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
-
-                                if(col+1 < boardState[row].length && row-1 > 0) //traversal 1
-                                if(boardState[row-1][col + 1] != null)
-                                    if(boardState[row-1][col + 1].isRed() == isLineRed)
+                            if(row-1 > 0) //traversal 1
+                                if(boardState[row-1][col] != null)
+                                    if(boardState[row-1][col].isRed() == isLineRed)
                                     {
-                                        if(isRed) { if(boardState[row-1][col+1].isRed()) {val++;} else val--; } else { if(boardState[row-1][col+1].isRed()) {val--;} else {val++;} } //val add
-                                        
-                                        if(col+2 < boardState[row].length && row-2 > 0) //traversal 2
-                                            if(boardState[row-2][col + 2] != null)
-                                                if(boardState[row-2][col + 2].isRed() == isLineRed)
+                                        if(isRed) { if(boardState[row-1][col].isRed()) {val++;} else val--; } else { if(boardState[row-1][col].isRed()) {val--;} else {val++;} } //val add
+
+                                        if(row-2 > 0) //traversal 2
+                                            if(boardState[row - 2][col] != null)
+                                                if(boardState[row-2][col].isRed() == isLineRed)
                                                 {
-                                                    if(isRed) { if(boardState[row-2][col+2].isRed()) {val++;} else val--; } else { if(boardState[row-2][col+2].isRed()) {val--;} else {val++;} } //val add
+                                                    if(isRed) { if(boardState[row-2][col].isRed()) {val++;} else val--; } else { if(boardState[row-2][col].isRed()) {val++;} else {val--;} } //val add
+                                                }
+                                    }
+                        }
+                    
+                    if(row-1 > 0)//check if direction has an open end
+                        if(boardState[row-1][col] == null)
+                        {
+                            //entry point with open left
+                            boolean isLineRed = boardState[row][col].isRed();
+                            if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
+
+                            if(row+1 < boardState.length - 1) //traversal 1
+                                if(boardState[row+1][col] != null)
+                                    if(boardState[row+1][col].isRed() == isLineRed)
+                                    {
+                                        if(isRed) { if(boardState[row+1][col].isRed()) {val++;} else val--; } else { if(boardState[row+1][col].isRed()) {val--;} else {val++;} } //val add
+                                        
+                                        if(row+2 < boardState.length - 1) //traversal 2
+                                            if(boardState[row+2][col] != null)
+                                                if(boardState[row+2][col].isRed() == isLineRed)
+                                                {
+                                                    if(isRed) { if(boardState[row+2][col].isRed()) {val++;} else val--; } else { if(boardState[row+2][col].isRed()) {val--;} else {val++;} } //val add
                                                 }
 
                                     }
-                            }
+                        }
 
-                        if(col-1 > 0 && row-1 > 0)
-                            if(boardState[row-1][col-1] == null)
-                            {
-                                //entry point with open left and up
-                                boolean isLineRed = boardState[row][col].isRed();
-                                if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
 
-                                if(col+1 < boardState[row].length && row+1 < boardState.length - 1) //traversal 1
-                                if(boardState[row+1][col + 1] != null)
-                                    if(boardState[row+1][col + 1].isRed() == isLineRed)
+                    if(col-1 > 0)
+                        if(boardState[row][col - 1] == null)
+                        {
+                            //entry point with open up
+                            boolean isLineRed = boardState[row][col].isRed();
+                            if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
+
+                            if(col+1 < boardState[row].length - 1) //traversal 1
+                                if(boardState[row][col+1] != null)
+                                    if(boardState[row][col+1].isRed() == isLineRed)
                                     {
-                                        if(isRed) { if(boardState[row+1][col+1].isRed()) {val++;} else val--; } else { if(boardState[row+1][col+1].isRed()) {val--;} else {val++;} } //val add
+                                        if(isRed) { if(boardState[row][col+1].isRed()) {val++;} else val--; } else { if(boardState[row][col+1].isRed()) {val--;} else {val++;} } //val add
                                         
-                                        if(col+2 < boardState[row].length && row+2 < boardState.length - 1) //traversal 2
-                                            if(boardState[row+2][col + 2] != null)
-                                                if(boardState[row+2][col + 2].isRed() == isLineRed)
+                                        if(col+2 < boardState[row].length - 1) //traversal 2
+                                            if(boardState[row][col+2] != null)
+                                                if(boardState[row][col+2].isRed() == isLineRed)
                                                 {
-                                                    if(isRed) { if(boardState[row+2][col+2].isRed()) {val++;} else val--; } else { if(boardState[row+2][col+2].isRed()) {val--;} else {val++;} } //val add
+                                                    if(isRed) { if(boardState[row][col+2].isRed()) {val++;} else val--; } else { if(boardState[row][col+2].isRed()) {val--;} else {val++;} } //val add
                                                 }
 
                                     }
-                            }
+                        }
 
-                        if(col+1 < boardState[row].length && row+1 < boardState.length - 1)
-                            if(boardState[row+1][col + 1] == null)
-                            {
-                                //entry point with open right and down
-                                boolean isLineRed = boardState[row][col].isRed();
-                                if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
+                    // if(col+1 < boardState[row].length - 1)
+                    //     if(boardState[row][col + 1] == null)
+                    //     {
+                    //         //entry point with open down??????
+                    //         boolean isLineRed = boardState[row][col].isRed();
+                    //         if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
 
-                                if(col-1 > 0 && row-1 > 0) //traversal 1
-                                if(boardState[row-1][col - 1] != null)
-                                    if(boardState[row-1][col - 1].isRed() == isLineRed)
-                                    {
-                                        if(isRed) { if(boardState[row-1][col-1].isRed()) {val++;} else val--; } else { if(boardState[row-1][col-1].isRed()) {val--;} else {val++;} } //val add
+                    //         if(col-1 > 0) //traversal 1
+                    //             if(boardState[row][col-1] != null)
+                    //                 if(boardState[row][col-1].isRed() == isLineRed)
+                    //                 {
+                    //                     if(isRed) { if(boardState[row][col-1].isRed()) {val++;} else val--; } else { if(boardState[row][col-1].isRed()) {val--;} else {val++;} } //val add
                                         
-                                        if(col-2 > 0 && row-2 > 0) //traversal 2
-                                            if(boardState[row-2][col - 2] != null)
-                                                if(boardState[row-2][col - 2].isRed() == isLineRed)
-                                                {
-                                                    if(isRed) { if(boardState[row-2][col-2].isRed()) {val++;} else val--; } else { if(boardState[row-2][col-2].isRed()) {val--;} else {val++;} } //val add
-                                                }
+                    //                     if(col-2 > 0) //traversal 2
+                    //                         if(boardState[row][col-2] != null)
+                    //                             if(boardState[row][col-2].isRed() == isLineRed)
+                    //                             {
+                    //                                 if(isRed) { if(boardState[row][col-2].isRed()) {val++;} else val--; } else { if(boardState[row][col-2].isRed()) {val--;} else {val++;} } //val add
+                    //                             }
 
-                                    }
-                            }
+                    //                 }
+                    //     }
 
-                        if(col+1 < boardState[row].length && row-1 > 0)
-                            if(boardState[row-1][col+1] == null)
-                            {
-                                //entry point with open left and down
-                                boolean isLineRed = boardState[row][col].isRed();
-                                if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
+                    //diagonal directions
+                    if(col-1 > 0 && row+1 < boardState.length - 1)
+                        if(boardState[row + 1][col - 1] == null)
+                        {
+                            //entry point with open right and up
+                            boolean isLineRed = boardState[row][col].isRed();
+                            if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
 
-                                if(col-1 > 0 && row+1 < boardState.length - 1) //traversal 1
-                                if(boardState[row+1][col - 1] != null)
-                                    if(boardState[row+1][col - 1].isRed() == isLineRed)
-                                    {
-                                        if(isRed) { if(boardState[row+1][col-1].isRed()) {val++;} else val--; } else { if(boardState[row+1][col-1].isRed()) {val--;} else {val++;} } //val add
-                                        
-                                        if(col-2 > 0 && row+2 < boardState.length - 1) //traversal 2
-                                            if(boardState[row+2][col - 2] != null)
-                                                if(boardState[row+2][col - 2].isRed() == isLineRed)
-                                                {
-                                                    if(isRed) { if(boardState[row+2][col-2].isRed()) {val++;} else val--; } else { if(boardState[row+2][col-2].isRed()) {val--;} else {val++;} } //val add
-                                                }
+                            if(col+1 < boardState[row].length && row-1 > 0) //traversal 1
+                            if(boardState[row-1][col + 1] != null)
+                                if(boardState[row-1][col + 1].isRed() == isLineRed)
+                                {
+                                    if(isRed) { if(boardState[row-1][col+1].isRed()) {val++;} else val--; } else { if(boardState[row-1][col+1].isRed()) {val--;} else {val++;} } //val add
+                                    
+                                    if(col+2 < boardState[row].length && row-2 > 0) //traversal 2
+                                        if(boardState[row-2][col + 2] != null)
+                                            if(boardState[row-2][col + 2].isRed() == isLineRed)
+                                            {
+                                                if(isRed) { if(boardState[row-2][col+2].isRed()) {val++;} else val--; } else { if(boardState[row-2][col+2].isRed()) {val--;} else {val++;} } //val add
+                                            }
 
-                                    }
-                            }
-                    }
+                                }
+                        }
+
+                    if(col-1 > 0 && row-1 > 0)
+                        if(boardState[row-1][col-1] == null)
+                        {
+                            //entry point with open left and up
+                            boolean isLineRed = boardState[row][col].isRed();
+                            if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
+
+                            if(col+1 < boardState[row].length && row+1 < boardState.length - 1) //traversal 1
+                            if(boardState[row+1][col + 1] != null)
+                                if(boardState[row+1][col + 1].isRed() == isLineRed)
+                                {
+                                    if(isRed) { if(boardState[row+1][col+1].isRed()) {val++;} else val--; } else { if(boardState[row+1][col+1].isRed()) {val--;} else {val++;} } //val add
+                                    
+                                    if(col+2 < boardState[row].length && row+2 < boardState.length - 1) //traversal 2
+                                        if(boardState[row+2][col + 2] != null)
+                                            if(boardState[row+2][col + 2].isRed() == isLineRed)
+                                            {
+                                                if(isRed) { if(boardState[row+2][col+2].isRed()) {val++;} else val--; } else { if(boardState[row+2][col+2].isRed()) {val--;} else {val++;} } //val add
+                                            }
+
+                                }
+                        }
+
+                    if(col+1 < boardState[row].length && row+1 < boardState.length - 1)
+                        if(boardState[row+1][col + 1] == null)
+                        {
+                            //entry point with open right and down
+                            boolean isLineRed = boardState[row][col].isRed();
+                            if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
+
+                            if(col-1 > 0 && row-1 > 0) //traversal 1
+                            if(boardState[row-1][col - 1] != null)
+                                if(boardState[row-1][col - 1].isRed() == isLineRed)
+                                {
+                                    if(isRed) { if(boardState[row-1][col-1].isRed()) {val++;} else val--; } else { if(boardState[row-1][col-1].isRed()) {val--;} else {val++;} } //val add
+                                    
+                                    if(col-2 > 0 && row-2 > 0) //traversal 2
+                                        if(boardState[row-2][col - 2] != null)
+                                            if(boardState[row-2][col - 2].isRed() == isLineRed)
+                                            {
+                                                if(isRed) { if(boardState[row-2][col-2].isRed()) {val++;} else val--; } else { if(boardState[row-2][col-2].isRed()) {val--;} else {val++;} } //val add
+                                            }
+
+                                }
+                        }
+
+                    if(col+1 < boardState[row].length && row-1 > 0)
+                        if(boardState[row-1][col+1] == null)
+                        {
+                            //entry point with open left and down
+                            boolean isLineRed = boardState[row][col].isRed();
+                            if(isRed) { if(boardState[row][col].isRed()) {val++;} else val--; } else { if(boardState[row][col].isRed()) {val--;} else {val++;} } //val add
+
+                            if(col-1 > 0 && row+1 < boardState.length - 1) //traversal 1
+                            if(boardState[row+1][col - 1] != null)
+                                if(boardState[row+1][col - 1].isRed() == isLineRed)
+                                {
+                                    if(isRed) { if(boardState[row+1][col-1].isRed()) {val++;} else val--; } else { if(boardState[row+1][col-1].isRed()) {val--;} else {val++;} } //val add
+                                    
+                                    if(col-2 > 0 && row+2 < boardState.length - 1) //traversal 2
+                                        if(boardState[row+2][col - 2] != null)
+                                            if(boardState[row+2][col - 2].isRed() == isLineRed)
+                                            {
+                                                if(isRed) { if(boardState[row+2][col-2].isRed()) {val++;} else val--; } else { if(boardState[row+2][col-2].isRed()) {val--;} else {val++;} } //val add
+                                            }
+
+                                }
+                        }
                 }
             }
+        }
 
         if(checkForWin(boardState, isRed))
-            val += 2000; //very good ;)
+            val += 40; //very good ;)
         if(checkForWin(boardState, !isRed))
-            val = Integer.MIN_VALUE; //more than very bad ;)
+            val -= 4000; //very bad ;)
 
         return val;
     }
