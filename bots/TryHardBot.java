@@ -9,7 +9,8 @@ import game.Puck;
 /**
  * A bot that tries to win, or block the opponent from winning, if possible.
  * Otherwise, it makes a random move (inspired by WalliBots)
- *
+ * 
+ * @author natpeterson@gmail.com with ChatGPT ;-)
  */
 public class TryHardBot implements BotInterface {
 
@@ -19,6 +20,7 @@ public class TryHardBot implements BotInterface {
     @Override
     public void setColor(boolean isRed) {
         this.isRed = isRed;
+        System.out.println("TryHardBot is " + (isRed ? "red" : "black") + "!");
     }
 
     @Override
