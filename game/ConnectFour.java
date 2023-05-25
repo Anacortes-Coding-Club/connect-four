@@ -132,11 +132,10 @@ public class ConnectFour {
             int inARow = 0;
             for (int c = 0; c < 7; c++) {
                 if(isColorPuck(gameBoard[r][c], checkRed)) {
-                    inARow++;
+                    if(inARow++ >= 3) return true;
                 } else {
                     inARow = 0;
                 }
-                if(inARow >= 4) return true;
             }
         }
 
@@ -144,11 +143,10 @@ public class ConnectFour {
             int inARow = 0;
             for (int r = 0; r < 6; r++) {
                 if(isColorPuck(gameBoard[r][c], checkRed)) {
-                    inARow++;
+                    if(inARow++ >= 3) return true;
                 } else {
                     inARow = 0;
                 }
-                if(inARow >= 4) return true;
             }
         }
 
@@ -158,11 +156,10 @@ public class ConnectFour {
             if(c < 0) start -= c;
             for (int r = start; r < 6 && c+r < 7; r++) {
                 if(isColorPuck(gameBoard[r][c+r], checkRed)) {
-                    inARow++;
+                    if(inARow++ >= 3) return true;
                 } else {
                     inARow = 0;
                 }
-                if(inARow >= 4) return true;
             }
         }
 
@@ -172,11 +169,10 @@ public class ConnectFour {
             if(c >= 7) start += c-6;
             for (int r = start; r < 6 && c-r >= 0; r++) {
                 if(isColorPuck(gameBoard[r][c-r], checkRed)) {
-                    inARow++;
+                    if(inARow++ >= 3) return true;
                 } else {
                     inARow = 0;
                 }
-                if(inARow >= 4) return true;
             }
         }
 
@@ -229,7 +225,7 @@ public class ConnectFour {
     }
 
     public static void main(String[] args) {
-        ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot(), 500);
+        ConnectFour match = new ConnectFour(new WalliBot(), new WalliBot2(0), 500);
         // ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot(), false);
         match.runGame(true);
 
