@@ -4,21 +4,17 @@ import game.BotInterface;
 import game.Puck;
 
 public class WalliBot implements BotInterface{
-    private boolean isRed = false;
 
     /**
      * Creates a WalliBot object.
      */
-    public WalliBot() {
-    }
+    public WalliBot() {}
 
     /**
      * Sets the piece color the bot is playing. Method will be called at the start of each game.
      * @param isRed     playing red if true, playing black if false.
      */
-    public void setColor(boolean isRed) {
-        this.isRed = isRed;
-    }
+    public void setColor(boolean isRed) {}
 
     /**
      * Returns the column index of the bot's next move based off the current gameBoard.
@@ -28,5 +24,4 @@ public class WalliBot implements BotInterface{
     public int takeTurn(Puck[][] gameBoard) {
         return (int) (Math.random() * 7.0);
     }
-    
 }

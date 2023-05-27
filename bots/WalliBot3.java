@@ -1,9 +1,7 @@
 package bots;
 
-import java.awt.Color;
-
-import game.*;
-import game.VisualHelper.Renderer;
+import game.BotInterface;
+import game.Puck;
 
 public class WalliBot3 implements BotInterface{
     private boolean isRed = false;
@@ -12,8 +10,7 @@ public class WalliBot3 implements BotInterface{
     /**
      * Creates a WalliBot3 object.
      */
-    public WalliBot3() {
-    }
+    public WalliBot3() {}
 
     /**
      * Sets the piece color the bot is playing. Method will be called at the start of each game.
@@ -193,25 +190,5 @@ public class WalliBot3 implements BotInterface{
             }
         }
         return clone;
-    }
-
-    public static void main(String[] args) {
-        WalliBot3 test = new WalliBot3();
-        Puck[][] board = new Puck[6][7];
-
-        WalliBot3.placePuck(board, 0, false);
-        WalliBot3.placePuck(board, 0, false);
-        WalliBot3.placePuck(board, 0, false);
-        WalliBot3.placePuck(board, 0, true);
-        WalliBot3.placePuck(board, 1, false);
-        WalliBot3.placePuck(board, 1, false);
-        WalliBot3.placePuck(board, 1, true);
-        WalliBot3.placePuck(board, 2, false);
-        WalliBot3.placePuck(board, 2, true);
-        System.out.println(checkForWin(board, true));
-
-        VisualInterface rend = new Renderer(Color.GRAY);
-        rend.updateVisuals(board);
-
     }
 }

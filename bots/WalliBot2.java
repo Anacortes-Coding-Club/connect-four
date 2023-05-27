@@ -4,7 +4,6 @@ import game.BotInterface;
 import game.Puck;
 
 public class WalliBot2 implements BotInterface{
-    private boolean isRed = false;
     private int i = 0;
 
     /**
@@ -19,9 +18,7 @@ public class WalliBot2 implements BotInterface{
      * Sets the piece color the bot is playing. Method will be called at the start of each game.
      * @param isRed     playing red if true, playing black if false.
      */
-    public void setColor(boolean isRed) {
-        this.isRed = isRed;
-    }
+    public void setColor(boolean isRed) {}
 
     /**
      * Returns the column index of the bot's next move based off the current gameBoard.
