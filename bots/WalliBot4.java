@@ -1,16 +1,18 @@
 package bots;
 
+import java.util.ArrayList;
+
 import game.BotInterface;
 import game.Puck;
 
-public class WalliBot3 implements BotInterface{
+public class WalliBot4 implements BotInterface{
     private boolean isRed = false;
     private Puck[][] boardCopy;
 
     /**
-     * Creates a WalliBot3 object.
+     * Creates a WalliBot4 object.
      */
-    public WalliBot3() {}
+    public WalliBot4() {}
 
     /**
      * Sets the piece color the bot is playing. Method will be called at the start of each game.
@@ -27,20 +29,80 @@ public class WalliBot3 implements BotInterface{
      */
     public int takeTurn(Puck[][] gameBoard) {
         boardCopy = getClone(gameBoard);
-        int win = checkForWin(boardCopy, isRed);
-        if(win != -1) return win;
 
-        int lose = checkForWin(boardCopy, !isRed);
-        if(lose != -1) return lose;
-
-        int random = (int) (Math.random() * 7.0);
-        if(isValid(boardCopy, random)) return random;
-
-        for(int i = 0; i < gameBoard.length; i++) {
-            if(isValid(boardCopy, i)) return i;
+        double[] ratings = rateMoves(boardCopy, 5, false);
+        
+        double bestRating = -1;
+        for (int i = 0; i < ratings.length; i++) {
+            if(ratings[i] > bestRating) {
+                bestRating = ratings[i];
+            }
         }
 
-        return (int) (Math.random() * 7.0);
+        if(bestRating == -1) {
+            for (int i = 0; i < ratings.length; i++) {
+                if(!colLoses(gameBoard, i, isRed)) {
+                    return i;
+                }
+            }
+        }
+
+        ArrayList<Integer> bestCols = new ArrayList<>();
+        for (int i = 0; i < ratings.length; i++) {
+            if(ratings[i] == bestRating) {
+                bestCols.add(i);
+            }
+        }
+
+        return bestCols.get((int) (Math.random() * bestCols.size()));
+    }
+
+    /**
+     * Returns the rating of each column play.
+     * @param gameBoard         gameBoard to test.
+     * @param recursionDepth    # of moves to look ahead.
+     * @param isRed             true if the puck color of the play is red.
+     * @return                  array of ratings -1 to 1, 1 being a win & 2 being a loss.
+     */
+    private static double[] rateMoves(Puck[][] gameBoard, int recursionDepth, boolean isRed) {
+        double[] ratings = new double[7];
+        if(recursionDepth == 0) return new double[] {0,0,0,0,0,0,0};
+
+        for (int i = 0; i < gameBoard[0].length; i++) {
+            if(colWins(gameBoard, i, isRed)) {
+                ratings[i] = 1;
+            } else if(colLoses(gameBoard, i, isRed)) {
+                ratings[i] = -1;
+            } else if(colWins(gameBoard, i, !isRed)){
+                ratings[i] = 0.75;
+            } else {
+                Puck[][] tempBoard = getClone(gameBoard);
+                placePuck(tempBoard, i, isRed);
+                double[] scores = rateMoves(tempBoard, recursionDepth - 1, !isRed);
+                double scoreTotal = 0;
+                
+                for (double s : scores) {
+                    scoreTotal += s;
+                }
+
+                ratings[i] = -scoreTotal / 7;
+            }
+        }
+
+        return ratings;
+    }
+
+    /**
+     * returns true if a play loses.
+     * @param gameBoard     gameBoard to test.
+     * @param column        column placement to test.
+     * @return              Returns true if a play loses, false if it does not.
+     */
+    private static boolean colLoses(Puck[][] gameBoard, int column, boolean isRed) {
+        Puck[][] tempBoard = getClone(gameBoard); 
+        if(placePuck(tempBoard, column, isRed)) return true;
+        if(checkForWin(tempBoard, !isRed) != -1) return true;
+        return false;
     }
 
     /**
@@ -141,19 +203,6 @@ public class WalliBot3 implements BotInterface{
             }
         }
         return true;
-    }
-
-    /**
-     * Returns true is column on gameBoard is a valid move
-     * @param gameBoard
-     * @param column
-     * @return
-     */
-    private boolean isValid(Puck[][] gameBoard, int column) {
-        if(gameBoard[0][column] == null) {
-            return true;
-        }
-        return false;
     }
 
     /**
