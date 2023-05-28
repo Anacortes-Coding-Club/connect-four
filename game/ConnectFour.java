@@ -85,7 +85,7 @@ public class ConnectFour {
             loop = takeTurn(player1, p1IsRed);
             if(turn++ >= maxTurns) {
                 loop = false;
-                System.out.print(player1.getClass().getSimpleName());
+                System.out.print("\t" + player1.getClass().getSimpleName());
                 if(p1IsRed) {
                     System.out.println(" (red) wins, placed last piece!");
                 } else {
@@ -104,7 +104,7 @@ public class ConnectFour {
                 loop = takeTurn(player2, !p1IsRed);
                 if(turn++ >= maxTurns) {
                     loop = false;
-                    System.out.print(player2.getClass().getSimpleName());
+                    System.out.print("\t" + player2.getClass().getSimpleName());
                     if(!p1IsRed) {
                         System.out.println(" (red) wins, placed last piece!");
                     } else {
@@ -131,7 +131,7 @@ public class ConnectFour {
      */
     private boolean takeTurn(BotInterface player, boolean isRed) {
         if(placePuck(player.takeTurn(gameBoard), isRed)) {
-            System.out.print(player.getClass().getSimpleName());
+            System.out.print("\t\t" + player.getClass().getSimpleName());
             if(isRed) {
                 System.out.println(" (black) placed an invalid move.");
             } else {
@@ -142,7 +142,7 @@ public class ConnectFour {
         }
         updateVisuals();
         if(checkForWin(isRed)) {
-            System.out.print(player.getClass().getSimpleName());
+            System.out.print("\t" + player.getClass().getSimpleName());
             if(isRed) {
                 System.out.println(" (red) wins, 4 in a row!");
             } else {
