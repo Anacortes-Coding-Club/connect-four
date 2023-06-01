@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Four</title>
+</head>
+<style>
+    table {
+      border-collapse: collapse;
+      margin: auto;
+    }
+
+    td {
+      width: 50px;
+      height: 50px;
+      border: 1px solid black;
+    }
+
+    .red {
+      background-color: red;
+    }
+
+    .yellow {
+      background-color: yellow;
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td onclick="dropDisc(0)"></td>
+      <td onclick="dropDisc(1)"></td>
+      <td onclick="dropDisc(2)"></td>
+      <td onclick="dropDisc(3)"></td>
+      <td onclick="dropDisc(4)"></td>
+      <td onclick="dropDisc(5)"></td>
+      <td onclick="dropDisc(6)"></td>
+    </tr>
+    <tr>
+      <td onclick="dropDisc(0)"></td>
+      <td onclick="dropDisc(1)"></td>
+      <td onclick="dropDisc(2)"></td>
+      <td onclick="dropDisc(3)"></td>
+      <td onclick="dropDisc(4)"></td>
+      <td onclick="dropDisc(5)"></td>
+      <td onclick="dropDisc(6)"></td>
+    </tr>
+    <tr>
+      <td onclick="dropDisc(0)"></td>
+      <td onclick="dropDisc(1)"></td>
+      <td onclick="dropDisc(2)"></td>
+      <td onclick="dropDisc(3)"></td>
+      <td onclick="dropDisc(4)"></td>
+      <td onclick="dropDisc(5)"></td>
+      <td onclick="dropDisc(6)"></td>
+    </tr>
+    <tr>
+      <td onclick="dropDisc(0)"></td>
+      <td onclick="dropDisc(1)"></td>
+      <td onclick="dropDisc(2)"></td>
+      <td onclick="dropDisc(3)"></td>
+      <td onclick="dropDisc(4)"></td>
+      <td onclick="dropDisc(5)"></td>
+      <td onclick="dropDisc(6)"></td>
+    </tr>
+    <tr>
+      <td onclick="dropDisc(0)"></td>
+      <td onclick="dropDisc(1)"></td>
+      <td onclick="dropDisc(2)"></td>
+      <td onclick="dropDisc(3)"></td>
+      <td onclick="dropDisc(4)"></td>
+      <td onclick="dropDisc(5)"></td>
+      <td onclick="dropDisc(6)"></td>
+    </tr>
+    <tr>
+      <td onclick="dropDisc(0)"></td>
+      <td onclick="dropDisc(1)"></td>
+      <td onclick="dropDisc(2)"></td>
+      <td onclick="dropDisc(3)"></td>
+      <td onclick="dropDisc(4)"></td>
+      <td onclick="dropDisc(5)"></td>
+      <td onclick="dropDisc(6)"></td>
+    </tr>
+  </table>
+
+  <script>
+    var currentPlayer = 'red';
+    var isGameOver = false;
+
+    function dropDisc(column) {
+      if (isGameOver) return;
+
+      var cells = document.getElementsByTagName('td');
+      var rowIndex = 5;
+
+      for (var i = 35 + column; i >= column; i -= 7) {
+        if (!cells[i].classList.contains('red') && !cells[i].classList.contains('yellow')) {
+          cells[i].classList.add(currentPlayer);
+          break;
+        }
+        rowIndex--;
+      }
+
+      // Check for a win
+      if (checkWin(rowIndex, column)) {
+        isGameOver = true;
+        alert(currentPlayer.toUpperCase() + ' wins!');
+        return;
+      }
+
+      // Check for a draw
+      if (checkDraw()) {
+        isGameOver = true;
+        alert('It\'s a draw!');
+        return;
+      }
+
+      // Switch players
+      currentPlayer = (currentPlayer === 'red') ? 'yellow' : 'red';
+
+      // Bot's turn
+      if (currentPlayer === 'yellow') {
+        var botColumn = selectBotColumn();
+        setTimeout(function() {
+          dropDisc(botColumn);
+        }, 500);
+      }
+    }
+
+    function selectBotColumn() {
+      var emptyColumns = [];
+      var cells = document.getElementsByTagName('td');
+
+      for (var column = 0; column < 7; column++) {
+        if (!cells[column].classList.contains('red') && !cells[column].classList.contains('yellow')) {
+          emptyColumns.push(column);
+        }
+      }
+
+      // Randomly select a column
+      var randomIndex = Math.floor(Math.random() * emptyColumns.length);
+      return emptyColumns[randomIndex];
+    }
+
+    function checkWin(row, column) {
+      var cells = document.getElementsByTagName('td');
+      var color = (currentPlayer === 'red') ? 'red' : 'yellow';
+
+      // Check horizontally
+      var count = 0;
+      for (var c = 0; c < 7; c++) {
+        if (cells[row * 7 + c].classList.contains(color)) {
+          count++;
+          if (count === 4) return true;
+        } else {
+          count = 0;
+        }
+      }
+
+      // Check vertically
+      count = 0;
+      for (var r = 0; r < 6; r++) {
+        if (cells[r * 7 + column].classList.contains(color)) {
+          count++;
+          if (count === 4) return true;
+        } else {
+          count = 0;
+        }
+      }
+
+      // Check diagonally (top-left to bottom-right)
+      count = 0;
+      var startRow = Math.max(row - Math.min(row, column), 0);
+      var startCol = Math.max(column - Math.min(row, column), 0);
+      var endRow = Math.min(row + Math.min(6 - row, 6 - column), 5);
+      var endCol = Math.min(column + Math.min(6 - row, 6 - column), 6);
+      for (var i = startRow, j = startCol; i <= endRow && j <= endCol; i++, j++) {
+        if (cells[i * 7 + j].classList.contains(color)) {
+          count++;
+          if (count === 4) return true;
+        } else {
+          count = 0;
+        }
+      }
+
+      // Check diagonally (top-right to bottom-left)
+      count = 0;
+      startRow = Math.min(row + Math.min(row, 6 - column), 5);
+      startCol = Math.max(column - Math.min(row, 6 - column), 0);
+      endRow = Math.max(row - Math.min(6 - row, column), 0);
+      endCol = Math.min(column + Math.min(6 - row, column), 6);
+      for (var i = startRow, j = startCol; i >= endRow && j <= endCol; i--, j++) {
+        if (cells[i * 7 + j].classList.contains(color)) {
+          count++;
+          if (count === 4) return true;
+        } else {
+          count = 0;
+        }
+      }
+
+      return false;
+    }
+
+    function checkDraw() {
+      var cells = document.getElementsByTagName('td');
+      for (var i = 0; i < cells.length; i++) {
+        if (!cells[i].classList.contains('red') && !cells[i].classList.contains('yellow')) {
+          return false;
+        }
+      }
+      return true;
+    }
+  </script>
+</body>
+</html>
