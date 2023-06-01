@@ -229,7 +229,7 @@ public class ConnectFour {
     }
 
     public static void main(String[] args) {
-        ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot(), 500);
+        ConnectFour match = new ConnectFour(new WalliBot2(0), new LogansMiniMaxBot(), false);
         // ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot(), false);
         match.runGame(true);
 

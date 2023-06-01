@@ -66,6 +66,9 @@ public class Renderer implements VisualInterface
     @Override
     public void updateVisuals(Puck[][] gameBoard)
     {
+        //clear screen
+        habitat.erase();
+
         // board scale
         int scale = 64;
         
