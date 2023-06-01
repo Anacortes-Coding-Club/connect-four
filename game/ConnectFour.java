@@ -1,16 +1,13 @@
 package game;
 
 import game.VisualHelper.*;
-
 import java.awt.Color;
-import java.time.format.FormatStyle;
-
-import bots.*;
 
 public class ConnectFour {
     Puck[][] gameBoard = new Puck[6][7];
     BotInterface player1, player2;
-    int wins; //0 if equal wins, +1 for each player1 win, 
+    int p1Wins = 0;
+    int p2Wins = 0;
     VisualInterface rend;
     int delayMilliseconds = 0;
     boolean runInterface = true;
@@ -53,39 +50,74 @@ public class ConnectFour {
     }
 
     /**
-     * Runs two games, each with a different bot starting.
+     * Runs multiple games, each with a different bot starting.
      */
-    public void runGames() {
-        runGame(true);
-        runGame(false);
+    public void runGames(int games) {
+        boolean isRed = true;
+        while(games-- > 0) {
+            runGame(isRed);
+            isRed = !isRed;
+        }
+
+        printWins();
     }
 
     /**
      * Runs a ConnectFour game, specifying bot/player colors.
      * @param p1IsRed   true if player 1 is red, false if black.
      */
-    public void runGame(boolean p1IsRed) {
+    private void runGame(boolean p1IsRed) {
+        gameBoard = new Puck[6][7];
+        int turn = 1;
+        int maxTurns = gameBoard.length * gameBoard[0].length;
+
         player1.setColor(p1IsRed);
         player2.setColor(!p1IsRed);
+
+        if(p1IsRed) {
+            System.out.println(player1.getClass().getSimpleName() + " is red, " + player2.getClass().getSimpleName() + " is black.");
+        } else {
+            System.out.println(player2.getClass().getSimpleName() + " is red, " + player1.getClass().getSimpleName() + " is black.");
+        }
 
         boolean loop = true;
         while(loop) {
             loop = takeTurn(player1, p1IsRed);
+            if(turn++ >= maxTurns) {
+                loop = false;
+                System.out.print("\t" + player1.getClass().getSimpleName());
+                if(p1IsRed) {
+                    System.out.println(" (red) wins, placed last piece!");
+                } else {
+                    System.out.println(" (black) wins, placed last piece!");
+                }
+                p1Wins++;
+            }
 
             try {
                 Thread.sleep(delayMilliseconds);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
-            if(loop) loop = takeTurn(player2, !p1IsRed);
-            // System.out.println(wins);
+            if(loop) {
+                loop = takeTurn(player2, !p1IsRed);
+                if(turn++ >= maxTurns) {
+                    loop = false;
+                    System.out.print("\t" + player2.getClass().getSimpleName());
+                    if(!p1IsRed) {
+                        System.out.println(" (red) wins, placed last piece!");
+                    } else {
+                        System.out.println(" (black) wins, placed last piece!");
+                    }
+                    p2Wins++;
+                }
+            }
+            
 
             try {
                 Thread.sleep(delayMilliseconds);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -99,27 +131,43 @@ public class ConnectFour {
      */
     private boolean takeTurn(BotInterface player, boolean isRed) {
         if(placePuck(player.takeTurn(gameBoard), isRed)) {
+            System.out.print("\t\t" + player.getClass().getSimpleName());
             if(isRed) {
-                wins--;
-                System.out.println("black wins, invalid move");
+                System.out.println(" (black) placed an invalid move.");
             } else {
-                wins++;
-                System.out.println("red wins, invalid move");
+                System.out.println(" (red) placed an invalid move.");
             }
+            addWin(player, false);
             return false;
         }
         updateVisuals();
         if(checkForWin(isRed)) {
+            System.out.print("\t" + player.getClass().getSimpleName());
             if(isRed) {
-                wins++;
-                System.out.println("red wins, 4 in a row!");
+                System.out.println(" (red) wins, 4 in a row!");
             } else {
-                wins--;
-                System.out.println("black wins, 4 in a row!");
+                System.out.println(" (black) wins, 4 in a row!");
             }
+            addWin(player, true);
             return false;
         }
         return true;
+    }
+
+    private void addWin(BotInterface player, boolean playerWon) {
+        if(player == player1) {
+            if(playerWon) {
+                p1Wins++;
+            } else {
+                p2Wins++;
+            }
+        } else if(player == player2) {
+            if(playerWon) {
+                p2Wins++;
+            } else {
+                p1Wins++;
+            }
+        }
     }
 
     /**
@@ -224,10 +272,13 @@ public class ConnectFour {
         if(runInterface) rend.updateVisuals(gameBoard);
     }
 
-    public static void main(String[] args) {
-        ConnectFour match = new ConnectFour(new WalliBot(), new WalliBot2(0), 500);
-        // ConnectFour match = new ConnectFour(new WalliBot2(0), new WalliBot(), false);
-        match.runGame(true);
-
+    /**
+     * Print each bot's total wins.
+     */
+    public void printWins() {
+        System.out.println(
+            player1.getClass().getSimpleName() + " wins: " + p1Wins + "\n" +
+            player2.getClass().getSimpleName() + " wins: " + p2Wins
+        );
     }
 }
